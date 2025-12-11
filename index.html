@@ -2,116 +2,497 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Midnight Press – Character Generator</title>
+  <title>The Midnight Press – Character Generator</title>
   <style>
-    body {
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      margin: 0;
-      padding: 2rem;
-      background: #111;
-      color: #eee;
-    }
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap');
 
-    h1 {
-      margin-top: 0;
-      font-size: 1.8rem;
-    }
-
-    .container {
-      max-width: 800px;
-      margin: 0 auto;
-      background: #1b1b1b;
-      border: 1px solid #333;
-      border-radius: 8px;
-      padding: 1.5rem 2rem;
+    * {
       box-sizing: border-box;
     }
 
-    .status {
+    body {
+      font-family: 'Crimson Text', Georgia, serif;
+      margin: 0;
+      padding: 2rem;
+      min-height: 100vh;
+      background:
+              linear-gradient(45deg, #f5f2e8 0%, #f8f5ea 25%, #f2efe5 50%, #f0ede3 75%, #ede9df 100%),
+              repeating-linear-gradient(
+                      90deg,
+                      transparent,
+                      transparent 1px,
+                      rgba(0,0,0,0.02) 2px,
+                      rgba(0,0,0,0.02) 3px
+              );
+      color: #2c2c2c;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      animation: pageLoad 0.8s ease-out;
+    }
+
+    @keyframes pageLoad {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .masthead {
+      text-align: center;
+      border-bottom: 4px double #8b4513;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      background: linear-gradient(to right, transparent, rgba(139, 69, 19, 0.05), transparent);
+    }
+
+    .newspaper-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 3.2rem;
+      font-weight: 900;
+      margin: 0;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #1a1a1a;
+      text-shadow: 2px 2px 0px rgba(139, 69, 19, 0.2);
+      animation: titleFade 1.2s ease-out 0.3s both;
+    }
+
+    @keyframes titleFade {
+      from {
+        opacity: 0;
+        transform: scale(0.9);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    .subtitle {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.1rem;
+      font-style: italic;
+      margin: 0.5rem 0 0 0;
+      color: #8b4513;
+      letter-spacing: 0.05em;
+    }
+
+    .date-line {
       font-size: 0.9rem;
-      margin-bottom: 1rem;
-      color: #ccc;
+      margin-top: 0.5rem;
+      color: #666;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .container {
+      max-width: 850px;
+      width: 100%;
+      background:
+              linear-gradient(to bottom, #fefcf8, #faf8f4),
+              repeating-linear-gradient(
+                      0deg,
+                      transparent,
+                      transparent 24px,
+                      rgba(139, 69, 19, 0.1) 25px
+              );
+      border: 3px solid #8b4513;
+      border-radius: 0;
+      padding: 2rem 2.5rem;
+      box-shadow:
+              0 0 0 1px #d2b48c,
+              0 10px 30px rgba(0, 0, 0, 0.15),
+              inset 0 0 0 8px #fefcf8;
+      position: relative;
+      animation: containerSlide 0.8s ease-out 0.2s both;
+    }
+
+    @keyframes containerSlide {
+      from {
+        opacity: 0;
+        transform: translateX(-30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    /* Newspaper corner folds */
+    .container::before {
+      content: "";
+      position: absolute;
+      top: -3px;
+      right: -3px;
+      width: 20px;
+      height: 20px;
+      background: linear-gradient(-45deg, #d2b48c 0%, #8b4513 100%);
+      clip-path: polygon(0 0, 100% 0, 100% 100%);
+    }
+
+    .status {
+      font-size: 0.95rem;
+      margin-bottom: 1.5rem;
+      color: #666;
+      text-align: center;
+      font-style: italic;
+      padding: 0.5rem;
+      background: rgba(139, 69, 19, 0.05);
+      border-left: 3px solid #8b4513;
+      animation: statusFade 0.6s ease-out 0.8s both;
+    }
+
+    @keyframes statusFade {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     button {
-      background: #444;
-      color: #fff;
-      border: none;
-      padding: 0.7rem 1.5rem;
-      border-radius: 4px;
+      display: block;
+      margin: 0 auto 2rem auto;
+      font-family: 'Playfair Display', serif;
+      background: linear-gradient(145deg, #8b4513, #a0522d);
+      color: #fefcf8;
+      border: 2px solid #654321;
+      padding: 0.8rem 2.5rem;
+      font-size: 1.1rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
       cursor: pointer;
-      font-size: 1rem;
-      margin-bottom: 1.5rem;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      box-shadow:
+              0 4px 8px rgba(139, 69, 19, 0.3),
+              inset 0 1px 0 rgba(255, 255, 255, 0.2);
+      animation: buttonSlide 0.6s ease-out 1s both;
+    }
+
+    @keyframes buttonSlide {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    button::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+      transition: left 0.5s ease;
+    }
+
+    button:hover::before {
+      left: 100%;
     }
 
     button:disabled {
       opacity: 0.6;
       cursor: not-allowed;
+      background: #999;
+      border-color: #777;
     }
 
     button:hover:enabled {
-      background: #555;
+      background: linear-gradient(145deg, #a0522d, #8b4513);
+      transform: translateY(-2px);
+      box-shadow:
+              0 6px 15px rgba(139, 69, 19, 0.4),
+              inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    }
+
+    button:active:enabled {
+      transform: translateY(0);
+      box-shadow:
+              0 2px 5px rgba(139, 69, 19, 0.3),
+              inset 0 1px 0 rgba(255, 255, 255, 0.2);
     }
 
     .card {
-      border-top: 1px solid #333;
+      border-top: 3px double #8b4513;
       padding-top: 1.5rem;
+      margin-top: 1rem;
+      background: linear-gradient(to right, transparent, rgba(139, 69, 19, 0.02), transparent);
+      animation: cardSlide 0.6s ease-out;
+    }
+
+    @keyframes cardSlide {
+      from {
+        opacity: 0;
+        transform: translateX(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
     }
 
     .field {
-      margin-bottom: 0.7rem;
+      margin-bottom: 1.2rem;
+      padding: 0.5rem 0;
+      border-bottom: 1px dotted #d2b48c;
+      position: relative;
+      animation: fieldFade 0.4s ease-out both;
     }
 
+    .field:last-child {
+      border-bottom: none;
+    }
+
+    @keyframes fieldFade {
+      from {
+        opacity: 0;
+        transform: translateY(5px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .field:nth-child(1) { animation-delay: 0.1s; }
+    .field:nth-child(2) { animation-delay: 0.2s; }
+    .field:nth-child(3) { animation-delay: 0.3s; }
+    .field:nth-child(4) { animation-delay: 0.4s; }
+    .field:nth-child(5) { animation-delay: 0.5s; }
+    .field:nth-child(6) { animation-delay: 0.6s; }
+
     .field-label {
-      font-weight: 600;
+      font-family: 'Playfair Display', serif;
+      font-weight: 700;
       text-transform: uppercase;
-      font-size: 0.85rem;
-      letter-spacing: 0.05em;
-      color: #aaa;
+      font-size: 0.9rem;
+      letter-spacing: 0.1em;
+      color: #8b4513;
+      margin-bottom: 0.3rem;
+      position: relative;
+    }
+
+    .field-label::after {
+      content: "";
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      width: 30px;
+      height: 2px;
+      background: #8b4513;
+      transition: width 0.3s ease;
+    }
+
+    .field:hover .field-label::after {
+      width: 60px;
     }
 
     .field-value {
-      font-size: 1.05rem;
+      font-size: 1.1rem;
+      line-height: 1.5;
+      color: #2c2c2c;
+      position: relative;
+    }
+
+    .inline-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .inline-list span {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      background: rgba(139, 69, 19, 0.1);
+      border: 1px solid rgba(139, 69, 19, 0.3);
+      font-style: italic;
+      border-radius: 15px;
+      transition: all 0.3s ease;
+      animation: tagPop 0.4s ease-out both;
+    }
+
+    .inline-list span:nth-child(1) { animation-delay: 0.1s; }
+    .inline-list span:nth-child(2) { animation-delay: 0.2s; }
+    .inline-list span:nth-child(3) { animation-delay: 0.3s; }
+
+    @keyframes tagPop {
+      from {
+        opacity: 0;
+        transform: scale(0.8);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    .inline-list span:hover {
+      background: rgba(139, 69, 19, 0.2);
+      transform: translateY(-2px);
+      box-shadow: 0 2px 5px rgba(139, 69, 19, 0.2);
     }
 
     .inline-list span::after {
-      content: ", ";
-    }
-
-    .inline-list span:last-child::after {
       content: "";
     }
 
+    .slang-item {
+      display: block;
+      margin: 0.4rem 0;
+      padding-left: 1.5rem;
+      position: relative;
+      font-style: italic;
+      color: #555;
+      transition: color 0.3s ease;
+    }
+
+    .slang-item::before {
+      content: "▶";
+      position: absolute;
+      left: 0;
+      color: #8b4513;
+      font-size: 0.9rem;
+      animation: bulletPulse 2s ease-in-out infinite;
+    }
+
+    @keyframes bulletPulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.6; }
+    }
+
+    .slang-item:hover {
+      color: #2c2c2c;
+    }
+
+    .stats-container {
+      display: flex;
+      gap: 1.5rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .stat-item {
+      font-family: 'Playfair Display', serif;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+    }
+
+    .stat-value {
+      color: #8b4513;
+      font-weight: 700;
+      font-size: 1.1em;
+    }
+
     code {
-      background: #222;
-      padding: 0.1rem 0.3rem;
+      background: rgba(139, 69, 19, 0.1);
+      padding: 0.2rem 0.5rem;
       border-radius: 3px;
-      font-size: 0.85rem;
+      font-size: 0.9rem;
+      border: 1px solid rgba(139, 69, 19, 0.2);
+      color: #8b4513;
+      font-family: 'Courier New', monospace;
     }
 
     .error {
-      color: #f88;
+      color: #d2691e;
+      font-weight: 600;
     }
 
     .small {
-      font-size: 0.85rem;
-      color: #bbb;
+      font-size: 0.9rem;
+      color: #888;
+      text-align: center;
+      margin-top: 2rem;
+      font-style: italic;
+      padding-top: 1rem;
+      border-top: 1px dotted #d2b48c;
+    }
+
+    /* Typewriter effect for character names */
+    .typewriter {
+      overflow: hidden;
+      border-right: 2px solid #8b4513;
+      white-space: nowrap;
+      animation:
+              typing 1.5s steps(40, end),
+              blink-caret 0.75s step-end infinite;
+    }
+
+    @keyframes typing {
+      from { width: 0 }
+      to { width: 100% }
+    }
+
+    @keyframes blink-caret {
+      from, to { border-color: transparent }
+      50% { border-color: #8b4513; }
+    }
+
+    /* Ink spreading effect */
+    .ink-spread {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .ink-spread::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(139, 69, 19, 0.1), transparent);
+      animation: inkSpread 0.8s ease-out;
+    }
+
+    @keyframes inkSpread {
+      to {
+        left: 100%;
+      }
     }
   </style>
 </head>
 <body>
 <div class="container">
-  <h1>Midnight Press – Character Generator</h1>
-  <div class="status" id="status">
-    Loading data from local CSV file…
+  <div class="masthead">
+    <h1 class="newspaper-title">The Midnight Press</h1>
+    <div class="subtitle">Character Generator & Registry</div>
+    <div class="date-line">Special Edition • Today's Date</div>
   </div>
 
-  <button id="generateBtn" disabled>Generate Character</button>
+  <div class="status" id="status">
+    Loading character archives from local records...
+  </div>
 
-  <div class="card" id="output" aria-live="polite"></div>
+  <button id="generateBtn" disabled>Print New Character Profile</button>
+
+  <div class="card" id="output" aria-live="polite">
+    <div class="field">
+      <div class="field-label">Editorial Note</div>
+      <div class="field-value">
+        Press the button above to generate a fresh character profile from our extensive archives.
+      </div>
+    </div>
+  </div>
 
   <p class="small">
-    Data source: <code>CharGeneratorData.csv</code> (must be in the same folder as this file).
+    Source: <code>CharGeneratorData.csv</code> archive file required in same directory.
   </p>
 </div>
 
@@ -119,14 +500,13 @@
   // ==============================
   // CONFIG – LOCAL CSV FILE NAME
   // ==============================
-  // Rename your CSV to this, or update this string to match your filename
   const CSV_FILE_PATH = "CharGeneratorData.csv";
 
   const fallbackData = {
     firstNames: ["Anthony", "Ada", "Albert", "Alma"],
     lastNames: ["Abrams", "Aguilar", "Akiyama", "Alvarez"],
-    archetypes: ["The Detective", "The Themme Fatale", "The Hooligan", "The Socialite", "The Professor"],
-    descriptors: ["Good with hands", "Knowledgeable", "Short - fused", "Brown-noser", "Indominable"],
+    archetypes: ["The Detective", "The Femme Fatale", "The Hooligan", "The Socialite", "The Professor"],
+    descriptors: ["Good with hands", "Knowledgeable", "Short-fused", "Brown-noser", "Indomitable"],
     slang: ["Gun: Bean-shooter", "Gun: Gat", "Gun: Heater", "Gun: Rod", "Gun: Roscoe"]
   };
 
@@ -141,15 +521,16 @@
 
   const statusEl = document.getElementById("status");
   const outputEl = document.getElementById("output");
-  outputEl.innerHTML = `
-  <div class="field">
-    <div class="field-label">Waiting in the Wings</div>
-    <div class="field-value">
-      Click "Generate Character" to pull a fresh face out of the fog.
-    </div>
-  </div>
-`;
   const generateBtn = document.getElementById("generateBtn");
+
+  // Set today's date
+  document.querySelector('.date-line').textContent =
+          `Special Edition • ${new Date().toLocaleDateString('en-US', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+          })}`;
 
   // ==============================
   // CSV LOADING & PARSING
@@ -224,7 +605,6 @@
     state.slang = unique(slang);
   }
 
-  // Basic CSV row splitter that handles simple quoted fields
   function splitCsvRow(row) {
     const result = [];
     let current = "";
@@ -260,17 +640,16 @@
 
   function finalizeDataLoad(usedFallback) {
     const counts = [
-      `First names: ${state.firstNames.length}`,
-      `Last names: ${state.lastNames.length}`,
+      `Names: ${state.firstNames.length + state.lastNames.length}`,
       `Archetypes: ${state.archetypes.length}`,
-      `Adjectives: ${state.descriptors.length}`,
-      `Slang items: ${state.slang.length}`
+      `Traits: ${state.descriptors.length}`,
+      `Slang: ${state.slang.length}`
     ].join(" • ");
 
     if (usedFallback) {
-      statusEl.innerHTML = `<span class="error">Could not load local CSV. Using fallback data.</span> (${counts})`;
+      statusEl.innerHTML = `<span class="error">Archive file unavailable. Using emergency backup records.</span> (${counts})`;
     } else {
-      statusEl.textContent = `Data loaded from CSV. ${counts}`;
+      statusEl.textContent = `Character archives loaded successfully. ${counts} entries available.`;
     }
     generateBtn.disabled = false;
   }
@@ -297,9 +676,8 @@
     return result;
   }
 
-  // Distribute 9 points across 3 stats, min 1, max 5
   function generateStats() {
-    const stats = [1, 1, 1]; // Brawn, Skill, Gravitas
+    const stats = [1, 1, 1];
     let remaining = 6;
 
     while (remaining > 0) {
@@ -327,68 +705,79 @@
   // ==============================
 
   function generateCharacter() {
-    const first = randomFrom(state.firstNames) || "Unknown";
-    const last = randomFrom(state.lastNames) || "Stranger";
-    const archetype = randomFrom(state.archetypes) || "Drifter";
+    // Add loading animation
+    generateBtn.textContent = "Printing Profile...";
+    generateBtn.disabled = true;
 
-    const stats = generateStats();
-    const nerve = calculateNerve(stats.brawn, stats.gravitas);
+    setTimeout(() => {
+      const first = randomFrom(state.firstNames) || "Unknown";
+      const last = randomFrom(state.lastNames) || "Stranger";
+      const archetype = randomFrom(state.archetypes) || "Drifter";
 
-    const descriptors = state.descriptors.length > 0
-            ? randomSample(state.descriptors, 3)
-            : ["Mysterious", "Tired", "Sharp"];
+      const stats = generateStats();
+      const nerve = calculateNerve(stats.brawn, stats.gravitas);
 
-    const slang = state.slang.length > 0
-            ? randomSample(state.slang, 3)
-            : ["Gun: Bean-shooter", "Gun: Gat", "Gun: Heater"];
+      const descriptors = state.descriptors.length > 0
+              ? randomSample(state.descriptors, 3)
+              : ["Mysterious", "Tired", "Sharp"];
 
-    renderCharacter({
-      name: `${first} ${last}`,
-      archetype,
-      stats,
-      nerve,
-      descriptors,
-      slang
-    });
+      const slang = state.slang.length > 0
+              ? randomSample(state.slang, 3)
+              : ["Gun: Bean-shooter", "Gun: Gat", "Gun: Heater"];
+
+      renderCharacter({
+        name: `${first} ${last}`,
+        archetype,
+        stats,
+        nerve,
+        descriptors,
+        slang
+      });
+
+      generateBtn.textContent = "Print New Character Profile";
+      generateBtn.disabled = false;
+    }, 800);
   }
 
   function renderCharacter(char) {
-    const slangHtml = char.slang.join("<br>");
+    const slangHtml = char.slang
+            .map(s => `<span class="slang-item">${s}</span>`)
+            .join("");
 
     outputEl.innerHTML = `
         <div class="field">
-          <div class="field-label">Name</div>
-          <div class="field-value">${char.name}</div>
+          <div class="field-label">Subject Name</div>
+          <div class="field-value typewriter ink-spread">${char.name}</div>
         </div>
 
         <div class="field">
-          <div class="field-label">Archetype</div>
+          <div class="field-label">Classification</div>
           <div class="field-value">${char.archetype}</div>
         </div>
 
         <div class="field">
-          <div class="field-label">Stats</div>
-          <div class="field-value">
-            Brawn: ${char.stats.brawn} &nbsp; | &nbsp;
-            Skill: ${char.stats.skill} &nbsp; | &nbsp;
-            Gravitas: ${char.stats.gravitas}
+          <div class="field-label">Physical & Mental Attributes</div>
+          <div class="field-value stats-container">
+            <span class="stat-item">Brawn: <span class="stat-value">${char.stats.brawn}</span></span>
+            <span class="stat-item">Skill: <span class="stat-value">${char.stats.skill}</span></span>
+            <span class="stat-item">Gravitas: <span class="stat-value">${char.stats.gravitas}</span></span>
           </div>
         </div>
 
         <div class="field">
-          <div class="field-label">Nerve</div>
-          <div class="field-value">${char.nerve}</div>
+          <div class="field-label">Nerve Rating</div>
+          <div class="field-value"><span class="stat-value">${char.nerve}</span></div>
         </div>
 
         <div class="field">
-          <div class="field-label">Descriptors</div>
+          <div class="field-label">Notable Characteristics</div>
           <div class="field-value inline-list">
             ${char.descriptors.map(d => `<span>${d}</span>`).join("")}
           </div>
         </div>
 
         <div class="field">
-          <div class="field-label">Favorite Slang</div>
+          <div class="field-label">Street Vocabulary</div>
           <div class="field-value">
             ${slangHtml}
           </div>
@@ -397,13 +786,10 @@
   }
 
   // ==============================
-  // WIRE UP EVENTS & START
+  // INITIALIZE
   // ==============================
 
   generateBtn.addEventListener("click", generateCharacter);
-
-  // NOTE: this will fail if opened via file:// in some browsers.
-  // Best is to serve via a simple local web server.
   loadCsvData();
 </script>
 </body>
