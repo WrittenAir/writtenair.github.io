@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Midnight Press – Character Generator</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      margin: 0;
+      padding: 2rem;
+      background: #111;
+      color: #eee;
+    }
+
+    h1 {
+      margin-top: 0;
+      font-size: 1.8rem;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: #1b1b1b;
+      border: 1px solid #333;
+      border-radius: 8px;
+      padding: 1.5rem 2rem;
+      box-sizing: border-box;
+    }
+
+    .status {
+      font-size: 0.9rem;
+      margin-bottom: 1rem;
+      color: #ccc;
+    }
+
+    button {
+      background: #444;
+      color: #fff;
+      border: none;
+      padding: 0.7rem 1.5rem;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    button:hover:enabled {
+      background: #555;
+    }
+
+    .card {
+      border-top: 1px solid #333;
+      padding-top: 1.5rem;
+    }
+
+    .field {
+      margin-bottom: 0.7rem;
+    }
+
+    .field-label {
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 0.85rem;
+      letter-spacing: 0.05em;
+      color: #aaa;
+    }
+
+    .field-value {
+      font-size: 1.05rem;
+    }
+
+    .inline-list span::after {
+      content: ", ";
+    }
+
+    .inline-list span:last-child::after {
+      content: "";
+    }
+
+    code {
+      background: #222;
+      padding: 0.1rem 0.3rem;
+      border-radius: 3px;
+      font-size: 0.85rem;
+    }
+
+    .error {
+      color: #f88;
+    }
+
+    .small {
+      font-size: 0.85rem;
+      color: #bbb;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>Midnight Press – Character Generator</h1>
+  <div class="status" id="status">
+    Loading data from local CSV file…
+  </div>
+
+  <button id="generateBtn" disabled>Generate Character</button>
+
+  <div class="card" id="output" aria-live="polite"></div>
+
+  <p class="small">
+    Data source: <code>CharGeneratorData.csv</code> (must be in the same folder as this file).
+  </p>
+</div>
+
+<script>
+  // ==============================
+  // CONFIG – LOCAL CSV FILE NAME
+  // ==============================
+  // Rename your CSV to this, or update this string to match your filename
+  const CSV_FILE_PATH = "CharGeneratorData.csv";
+
+  const fallbackData = {
+    firstNames: ["Anthony", "Ada", "Albert", "Alma"],
+    lastNames: ["Abrams", "Aguilar", "Akiyama", "Alvarez"],
+    archetypes: ["The Detective", "The Themme Fatale", "The Hooligan", "The Socialite", "The Professor"],
+    descriptors: ["Good with hands", "Knowledgeable", "Short - fused", "Brown-noser", "Indominable"],
+    slang: ["Gun: Bean-shooter", "Gun: Gat", "Gun: Heater", "Gun: Rod", "Gun: Roscoe"]
+  };
+
+  const state = {
+    firstNames: [],
+    lastNames: [],
+    archetypes: [],
+    descriptors: [],
+    slang: [],
+    usingFallback: false
+  };
+
+  const statusEl = document.getElementById("status");
+  const outputEl = document.getElementById("output");
+  outputEl.innerHTML = `
+  <div class="field">
+    <div class="field-label">Waiting in the Wings</div>
+    <div class="field-value">
+      Click "Generate Character" to pull a fresh face out of the fog.
+    </div>
+  </div>
+`;
+  const generateBtn = document.getElementById("generateBtn");
+
+  // ==============================
+  // CSV LOADING & PARSING
+  // ==============================
+
+  async function loadCsvData() {
+    try {
+      const res = await fetch(CSV_FILE_PATH);
+      if (!res.ok) {
+        throw new Error("Network response was not ok");
+      }
+      const csvText = await res.text();
+      parseCsvIntoState(csvText);
+      finalizeDataLoad(false);
+    } catch (err) {
+      console.error("Error loading CSV, using fallback data:", err);
+      useFallbackData();
+      finalizeDataLoad(true);
+    }
+  }
+
+  function parseCsvIntoState(csvText) {
+    const lines = csvText.split(/\r?\n/).filter(line => line.trim().length > 0);
+    if (lines.length === 0) return;
+
+    const headers = splitCsvRow(lines[0]).map(h => h.trim());
+    const headerMap = {};
+
+    headers.forEach((h, idx) => {
+      const key = h.toLowerCase();
+      if (key.includes("first name")) headerMap.firstNames = idx;
+      else if (key.includes("last name")) headerMap.lastNames = idx;
+      else if (key.includes("archetype")) headerMap.archetypes = idx;
+      else if (key.includes("adjective")) headerMap.descriptors = idx;
+      else if (key.includes("slang")) headerMap.slang = idx;
+    });
+
+    const firstNames = [];
+    const lastNames = [];
+    const archetypes = [];
+    const descriptors = [];
+    const slang = [];
+
+    for (let i = 1; i < lines.length; i++) {
+      const row = splitCsvRow(lines[i]);
+      if (headerMap.firstNames !== undefined) {
+        const val = (row[headerMap.firstNames] || "").trim();
+        if (val) firstNames.push(val);
+      }
+      if (headerMap.lastNames !== undefined) {
+        const val = (row[headerMap.lastNames] || "").trim();
+        if (val) lastNames.push(val);
+      }
+      if (headerMap.archetypes !== undefined) {
+        const val = (row[headerMap.archetypes] || "").trim();
+        if (val) archetypes.push(val);
+      }
+      if (headerMap.descriptors !== undefined) {
+        const val = (row[headerMap.descriptors] || "").trim();
+        if (val) descriptors.push(val);
+      }
+      if (headerMap.slang !== undefined) {
+        const val = (row[headerMap.slang] || "").trim();
+        if (val) slang.push(val);
+      }
+    }
+
+    state.firstNames = unique(firstNames);
+    state.lastNames = unique(lastNames);
+    state.archetypes = unique(archetypes);
+    state.descriptors = unique(descriptors);
+    state.slang = unique(slang);
+  }
+
+  // Basic CSV row splitter that handles simple quoted fields
+  function splitCsvRow(row) {
+    const result = [];
+    let current = "";
+    let inQuotes = false;
+
+    for (let i = 0; i < row.length; i++) {
+      const char = row[i];
+      if (char === '"' && (i === 0 || row[i - 1] !== "\\")) {
+        inQuotes = !inQuotes;
+      } else if (char === "," && !inQuotes) {
+        result.push(current);
+        current = "";
+      } else {
+        current += char;
+      }
+    }
+    result.push(current);
+    return result;
+  }
+
+  function unique(arr) {
+    return [...new Set(arr)];
+  }
+
+  function useFallbackData() {
+    state.firstNames = fallbackData.firstNames;
+    state.lastNames = fallbackData.lastNames;
+    state.archetypes = fallbackData.archetypes;
+    state.descriptors = fallbackData.descriptors;
+    state.slang = fallbackData.slang;
+    state.usingFallback = true;
+  }
+
+  function finalizeDataLoad(usedFallback) {
+    const counts = [
+      `First names: ${state.firstNames.length}`,
+      `Last names: ${state.lastNames.length}`,
+      `Archetypes: ${state.archetypes.length}`,
+      `Adjectives: ${state.descriptors.length}`,
+      `Slang items: ${state.slang.length}`
+    ].join(" • ");
+
+    if (usedFallback) {
+      statusEl.innerHTML = `<span class="error">Could not load local CSV. Using fallback data.</span> (${counts})`;
+    } else {
+      statusEl.textContent = `Data loaded from CSV. ${counts}`;
+    }
+    generateBtn.disabled = false;
+  }
+
+  // ==============================
+  // RANDOM HELPERS
+  // ==============================
+
+  function randomFrom(array) {
+    if (!array || array.length === 0) return null;
+    const idx = Math.floor(Math.random() * array.length);
+    return array[idx];
+  }
+
+  function randomSample(array, count) {
+    const copy = [...array];
+    const result = [];
+    count = Math.min(count, copy.length);
+    for (let i = 0; i < count; i++) {
+      const idx = Math.floor(Math.random() * copy.length);
+      result.push(copy[idx]);
+      copy.splice(idx, 1);
+    }
+    return result;
+  }
+
+  // Distribute 9 points across 3 stats, min 1, max 5
+  function generateStats() {
+    const stats = [1, 1, 1]; // Brawn, Skill, Gravitas
+    let remaining = 6;
+
+    while (remaining > 0) {
+      const idx = Math.floor(Math.random() * 3);
+      if (stats[idx] < 5) {
+        stats[idx]++;
+        remaining--;
+      }
+    }
+
+    return {
+      brawn: stats[0],
+      skill: stats[1],
+      gravitas: stats[2]
+    };
+  }
+
+  function calculateNerve(brawn, gravitas) {
+    const base = Math.max(brawn, gravitas);
+    return 6 + base;
+  }
+
+  // ==============================
+  // CHARACTER GENERATION
+  // ==============================
+
+  function generateCharacter() {
+    const first = randomFrom(state.firstNames) || "Unknown";
+    const last = randomFrom(state.lastNames) || "Stranger";
+    const archetype = randomFrom(state.archetypes) || "Drifter";
+
+    const stats = generateStats();
+    const nerve = calculateNerve(stats.brawn, stats.gravitas);
+
+    const descriptors = state.descriptors.length > 0
+            ? randomSample(state.descriptors, 3)
+            : ["Mysterious", "Tired", "Sharp"];
+
+    const slang = state.slang.length > 0
+            ? randomSample(state.slang, 3)
+            : ["Gun: Bean-shooter", "Gun: Gat", "Gun: Heater"];
+
+    renderCharacter({
+      name: `${first} ${last}`,
+      archetype,
+      stats,
+      nerve,
+      descriptors,
+      slang
+    });
+  }
+
+  function renderCharacter(char) {
+    const slangHtml = char.slang.join("<br>");
+
+    outputEl.innerHTML = `
+        <div class="field">
+          <div class="field-label">Name</div>
+          <div class="field-value">${char.name}</div>
+        </div>
+
+        <div class="field">
+          <div class="field-label">Archetype</div>
+          <div class="field-value">${char.archetype}</div>
+        </div>
+
+        <div class="field">
+          <div class="field-label">Stats</div>
+          <div class="field-value">
+            Brawn: ${char.stats.brawn} &nbsp; | &nbsp;
+            Skill: ${char.stats.skill} &nbsp; | &nbsp;
+            Gravitas: ${char.stats.gravitas}
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="field-label">Nerve</div>
+          <div class="field-value">${char.nerve}</div>
+        </div>
+
+        <div class="field">
+          <div class="field-label">Descriptors</div>
+          <div class="field-value inline-list">
+            ${char.descriptors.map(d => `<span>${d}</span>`).join("")}
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="field-label">Favorite Slang</div>
+          <div class="field-value">
+            ${slangHtml}
+          </div>
+        </div>
+      `;
+  }
+
+  // ==============================
+  // WIRE UP EVENTS & START
+  // ==============================
+
+  generateBtn.addEventListener("click", generateCharacter);
+
+  // NOTE: this will fail if opened via file:// in some browsers.
+  // Best is to serve via a simple local web server.
+  loadCsvData();
+</script>
+</body>
+</html>
