@@ -202,7 +202,8 @@
   function finalizeLoad(usedFallback){
     const counts = `First names: ${state.firstNames.length} • Last names: ${state.lastNames.length} • Archetypes: ${state.archetypes.length} • Adjectives: ${state.descriptors.length} • Slang: ${state.slang.length}`;
     const statusEl = document.getElementById('status');
-    statusEl.innerHTML = usedFallback ? `<span style="color:#f88">Could not load CSV — using fallback data.</span> (${counts})` ;
+    statusEl.innerHTML = usedFallback ? `<span style="color:#f88">Could not load CSV — using fallback data.</span> (${counts})` : `Data loaded from CSV. ${counts}`;
+    document.getElementById('generateBtn').disabled = false;
     
   }
 
