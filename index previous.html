@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Midnight Press – Character Generator (Enhanced)</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&display=swap');
+
+    body {
+      font-family: 'Courier Prime', monospace;
+      margin: 0;
+      padding: 2rem;
+      background: #fff;
+      color: #000;
+      background-image: none;
+    }
+
+    h1 {
+      font-size: 2rem;
+      text-align: center;
+      letter-spacing: 0.08em;
+      margin: 0 0 1rem 0;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: #ffffff;
+      border: 2px solid #fff;
+      border-radius: 8px;
+      padding: 2rem;
+      position: relative;
+      box-shadow: none;
+    }
+
+    /* Smoky vignette effect */
+    
+
+    .toolbar {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+    }
+
+    .left-controls { display: flex; gap: .75rem; align-items: center; }
+
+    button {
+      background: #000;
+      color: #fff;
+      border: 2px solid #fff;
+      padding: 0.6rem 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+      font-family: 'Courier Prime', monospace;
+      letter-spacing: 0.05em;
+    }
+
+    button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    button:hover:enabled { background: #ffffff; }
+
+    .status {
+      font-size: 0.9rem;
+      color: #000;
+    }
+
+    .card { margin-top: 1rem; }
+
+    .field {
+      margin-bottom: 1.2rem;
+      padding-bottom: 0.8rem;
+      border-bottom: 1px dashed rgba(255,255,255,0.2);
+    }
+
+    .field-label {
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 0.85rem;
+      letter-spacing: 0.1em;
+      color: #000;
+      margin-bottom: 0.25rem;
+    }
+
+    .inline-list span::after { content: ", "; }
+    .inline-list span:last-child::after { content: ""; }
+
+    .abilities { white-space: pre-wrap; }
+
+    @media (max-width:600px){
+      .toolbar { flex-direction: column; align-items: stretch; gap: .5rem; }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>Midnight Press – Character Generator</h1>
+
+  <div class="toolbar">
+    <div class="left-controls">
+      <button id="generateBtn" disabled>Generate Character</button>
+      
+    </div>
+    <div class="status" id="status">Loading data from <code>CharGeneratorData.csv</code>…</div>
+  </div>
+
+  <div class="card" id="output" aria-live="polite">
+    <div class="field"><div class="field-label">Waiting in the wings</div>
+      <div>Click <strong>Generate Character</strong> once data has loaded.</div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ---------- Configuration ----------
+  const CSV_FILE_PATH = "CharGeneratorData.csv";
+
+  // ---------- Archetype definitions (display & abilities) ----------
+  const archetypeInfo = {
+    "The Detective": {
+      title: "Detective",
+      abilities: [
+        "Known About Town: Gain +1 Social Tie every adventure.",
+        "Hunch: Once per arc, receive a warning or insight that guides you toward or away from danger."
+      ]
+    },
+    "The Themme Fatale": {
+      title: "Themme Fatale",
+      abilities: [
+        "Play or Be Played: On your first Social Tie roll, 3 = they have power over you, 4 = you have power over them.",
+        "My Real Name Is…: Once per game, permanently change your three descriptors."
+      ]
+    },
+    "The Hooligan": {
+      title: "Hooligan",
+      abilities: [
+        "Average Joe: Roll twice and take the better result with working-class folks.",
+        "Know a Guy: Once per arc, you know someone who provides a needed good or service."
+      ]
+    },
+    "The Socialite": {
+      title: "Socialite",
+      abilities: [
+        "High Company: Roll twice and take the better result with high-class individuals.",
+        "Investor: Once per arc, you can front money for a major purchase the group couldn’t normally afford."
+      ]
+    },
+    "The Professor": {
+      title: "Professor",
+      abilities: [
+        "Respectable Company: On your first Social Tie roll, 2 and 5 = Mutual Connection.",
+        "Know It All: Once per arc, you know a random fact that's helpful in the moment."
+      ]
+    }
+  };
+
+  // ---------- State ----------
+  const state = {
+    firstNames: [],
+    lastNames: [],
+    archetypes: [],
+    descriptors: [],
+    slang: [],
+    usingFallback: false
+  };
+
+  // ---------- Fallback data (used if CSV fails) ----------
+  const fallbackData = {
+    firstNames: ["Anthony","Ada","Albert","Alma"],
+    lastNames: ["Abrams","Aguilar","Akiyama","Alvarez"],
+    archetypes: ["The Detective","The Themme Fatale","The Hooligan","The Socialite","The Professor"],
+    descriptors: ["Good with hands","Knowledgeable","Short-fused","Brown-noser","Indomitable"],
+    slang: ["bean-shooter","gat","heater","rod","roscoe"]
+  };
+
+  // ---------- CSV Loading & Parsing ----------
+  async function loadCsvData(){
+    try{
+      const res = await fetch(CSV_FILE_PATH);
+      if(!res.ok) throw new Error('Network response not ok');
+      const text = await res.text();
+      parseCsv(text);
+      finalizeLoad(false);
+    }catch(err){
+      console.warn('Failed to load CSV, using fallback data:', err);
+      useFallbackData();
+      finalizeLoad(true);
+    }
+  }
+
+  function useFallbackData(){
+    state.firstNames = [...fallbackData.firstNames];
+    state.lastNames = [...fallbackData.lastNames];
+    state.archetypes = [...fallbackData.archetypes];
+    state.descriptors = [...fallbackData.descriptors];
+    state.slang = [...fallbackData.slang];
+    state.usingFallback = true;
+  }
+
+  function finalizeLoad(usedFallback){
+    const counts = `First names: ${state.firstNames.length} • Last names: ${state.lastNames.length} • Archetypes: ${state.archetypes.length} • Adjectives: ${state.descriptors.length} • Slang: ${state.slang.length}`;
+    const statusEl = document.getElementById('status');
+    statusEl.innerHTML = usedFallback ? `<span style="color:#f88">Could not load CSV — using fallback data.</span> (${counts})` : `Data loaded from CSV. ${counts}`;
+    document.getElementById('generateBtn').disabled = false;
+    
+  }
+
+  // Basic CSV row splitter that handles quoted fields
+  function splitRow(row){
+    const out = [];
+    let cur = '';
+    let inQuotes = false;
+    for(let i=0;i<row.length;i++){
+      const ch = row[i];
+      if(ch === '"'){
+        inQuotes = !inQuotes;
+      }else if(ch === ',' && !inQuotes){
+        out.push(cur);
+        cur = '';
+      }else{
+        cur += ch;
+      }
+    }
+    out.push(cur);
+    return out.map(s=>s.trim());
+  }
+
+  function parseCsv(text){
+    // Split on CRLF or LF — the previous malformed regex caused a SyntaxError.
+    const lines = text.split(/\r?\n/).filter(l=>l.trim().length>0);
+    if(lines.length === 0) return useFallbackData();
+
+    const headers = splitRow(lines[0]).map(h=>h.toLowerCase());
+    const headerMap = {};
+    headers.forEach((h,idx)=>{
+      if(h.includes('first')) headerMap.first = idx;
+      else if(h.includes('last')) headerMap.last = idx;
+      else if(h.includes('archetype')) headerMap.arch = idx;
+      else if(h.includes('adjective') || h.includes('descriptor')) headerMap.desc = idx;
+      else if(h.includes('slang')) headerMap.slang = idx;
+    });
+
+    for(let i=1;i<lines.length;i++){
+      const row = splitRow(lines[i]);
+      if(headerMap.first !== undefined && row[headerMap.first]) state.firstNames.push(row[headerMap.first]);
+      if(headerMap.last !== undefined && row[headerMap.last]) state.lastNames.push(row[headerMap.last]);
+      if(headerMap.arch !== undefined && row[headerMap.arch]) state.archetypes.push(row[headerMap.arch]);
+      if(headerMap.desc !== undefined && row[headerMap.desc]) state.descriptors.push(row[headerMap.desc]);
+      if(headerMap.slang !== undefined && row[headerMap.slang]) state.slang.push(row[headerMap.slang]);
+    }
+
+    // De-duplicate lists
+    state.firstNames = Array.from(new Set(state.firstNames));
+    state.lastNames = Array.from(new Set(state.lastNames));
+    state.archetypes = Array.from(new Set(state.archetypes));
+    state.descriptors = Array.from(new Set(state.descriptors));
+    state.slang = Array.from(new Set(state.slang));
+  }
+
+  // ---------- Helpers ----------
+  function randomFrom(arr){ if(!arr || arr.length===0) return null; return arr[Math.floor(Math.random()*arr.length)]; }
+  function randomSample(arr, n){ if(!arr) return []; const copy = [...arr]; const out = []; n = Math.min(n, copy.length); for(let i=0;i<n;i++){ const idx = Math.floor(Math.random()*copy.length); out.push(copy[idx]); copy.splice(idx,1); } return out; }
+
+  function generateStats(){ const stats = [1,1,1]; let remaining = 6; while(remaining>0){ const i = Math.floor(Math.random()*3); if(stats[i] < 5){ stats[i]++; remaining--; } }
+    return { brawn: stats[0], skill: stats[1], gravitas: stats[2] };
+  }
+
+  function calculateNerve(brawn, gravitas){ return 6 + Math.max(brawn, gravitas); }
+
+  // ---------- Character Generation & Rendering ----------
+  function generateCharacter(){
+    const first = randomFrom(state.firstNames) || 'Unknown';
+    const last = randomFrom(state.lastNames) || 'Stranger';
+    const archetype = randomFrom(state.archetypes) || 'The Detective';
+
+    const info = archetypeInfo[archetype] || { title: archetype, abilities: [] };
+
+    const stats = generateStats();
+    const nerve = calculateNerve(stats.brawn, stats.gravitas);
+
+    const descriptors = randomSample(state.descriptors, 3);
+    const slang = randomSample(state.slang, 3);
+
+    const abilitiesHtml = info.abilities.length ? `<div class="abilities">${info.abilities.map(a=>`• ${a}`).join('\n')}</div>` : `<div class="abilities">(no archetype abilities defined)</div>`;
+
+    document.getElementById('output').innerHTML = `
+      <div class='field'><div class='field-label'>Name</div>${first} ${last}</div>
+      <div class='field'><div class='field-label'>Archetype</div>${info.title}</div>
+      <div class='field'><div class='field-label'>Abilities</div>${abilitiesHtml}</div>
+      <div class='field'><div class='field-label'>Stats</div>Brawn: ${stats.brawn} | Skill: ${stats.skill} | Gravitas: ${stats.gravitas}</div>
+      <div class='field'><div class='field-label'>Nerve</div>${nerve}</div>
+      <div class='field'><div class='field-label'>Descriptors</div><div class='inline-list'>${descriptors.map(d=>`<span>${d}</span>`).join('')}</div></div>
+      <div class='field'><div class='field-label'>Favorite Slang</div>${slang.join('<br>')}</div>
+    `;
+  }
+
+  // Allow regenerating without reloading CSV
+  // ---------- Wire up UI ----------
+  document.getElementById('generateBtn').addEventListener('click', generateCharacter);
+  
+
+  // Load CSV on start
+  loadCsvData();
+</script>
+</body>
+</html>
