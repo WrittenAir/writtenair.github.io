@@ -5,10 +5,7 @@
   <title>Midnight Press – Character Generator (Enhanced)</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <style>
-    /* A blackletter-like font is preferred for the heading.
-       We ask for Old English Text MT first (system), then fallback
-       to UnifrakturCook from Google Fonts (loaded below). */
-    @import url('https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&family=UnifrakturCook:wght@700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&display=swap');
 
     body {
       font-family: 'Courier Prime', monospace;
@@ -20,12 +17,10 @@
     }
 
     h1 {
-      font-size: 2.2rem;
+      font-size: 2rem;
       text-align: center;
       letter-spacing: 0.08em;
       margin: 0 0 1rem 0;
-      /* prefer system Old English, then UnifrakturCook (Google), then generic serif */
-      font-family: "Old English Text MT", "UnifrakturCook", "Blackletter", serif;
     }
 
     .container {
@@ -38,6 +33,9 @@
       position: relative;
       box-shadow: none;
     }
+
+    /* Smoky vignette effect */
+    
 
     .toolbar {
       display: flex;
@@ -62,16 +60,11 @@
 
     button:disabled { opacity: 0.5; cursor: not-allowed; }
 
-   button:hover:enabled {
-  filter: brightness(1.15);
-  color: #fff;
-}
+    button:hover:enabled { background: #ffffff; }
 
     .status {
       font-size: 0.9rem;
       color: #000;
-      /* keep a small reserved area but do not show CSV counts by default */
-      min-height: 1.1rem;
     }
 
     .card { margin-top: 1rem; }
@@ -79,7 +72,7 @@
     .field {
       margin-bottom: 1.2rem;
       padding-bottom: 0.8rem;
-      border-bottom: 1px dashed rgba(0,0,0,0.08);
+      border-bottom: 1px dashed rgba(255,255,255,0.2);
     }
 
     .field-label {
@@ -94,7 +87,7 @@
     .inline-list span::after { content: ", "; }
     .inline-list span:last-child::after { content: ""; }
 
-    .abilities { white-space: pre-wrap; font-family: 'Courier Prime', monospace; }
+    .abilities { white-space: pre-wrap; }
 
     @media (max-width:600px){
       .toolbar { flex-direction: column; align-items: stretch; gap: .5rem; }
@@ -108,9 +101,9 @@
   <div class="toolbar">
     <div class="left-controls">
       <button id="generateBtn" disabled>Generate Character</button>
+      
     </div>
-    <!-- status is intentionally left blank after load so it won't interrupt visuals -->
-    <div class="status" id="status"></div>
+    <div class="status" id="status">Loading data from <code>CharGeneratorData.csv</code>…</div>
   </div>
 
   <div class="card" id="output" aria-live="polite">
@@ -160,24 +153,6 @@
         "Respectable Company: On your first Social Tie roll, 2 and 5 = Mutual Connection.",
         "Know It All: Once per arc, you know a random fact that's helpful in the moment."
       ]
-    },
-    /* Cat Burglar abilities derived from the rules document:
-       - Rough past: Roll two dice and choose the best when interacting with lowlifes
-       - Sticky Fingers: Once per Adventure arc you can pull out of your pocket an item of little value that you otherwise would not be expected to have in your pocket. */
-    "The Cat Burglar": {
-      title: "Cat Burglar",
-      abilities: [
-        "Rough Past: Roll two dice and choose the best when interacting with lowlifes (people with sketchy pasts and criminal backgrounds).",
-        "Sticky Fingers: Once per Adventure arc you can pull out of your pocket an item of little value that you otherwise would not be expected to have. You nabbed it somewhere on your way because you “thought it might be useful.”"
-      ]
-    },
-    /* include the variant without 'The' in case CSV uses that form */
-    "Cat Burglar": {
-      title: "Cat Burglar",
-      abilities: [
-        "Rough Past: Roll two dice and choose the best when interacting with lowlifes (people with sketchy pasts and criminal backgrounds).",
-        "Sticky Fingers: Once per Adventure arc you can pull out of your pocket an item of little value that you otherwise would not be expected to have. You nabbed it somewhere on your way because you “thought it might be useful.”"
-      ]
     }
   };
 
@@ -195,7 +170,7 @@
   const fallbackData = {
     firstNames: ["Anthony","Ada","Albert","Alma"],
     lastNames: ["Abrams","Aguilar","Akiyama","Alvarez"],
-    archetypes: ["The Detective","The Themme Fatale","The Hooligan","The Socialite","The Professor","Cat Burglar"],
+    archetypes: ["The Detective","The Themme Fatale","The Hooligan","The Socialite","The Professor"],
     descriptors: ["Good with hands","Knowledgeable","Short-fused","Brown-noser","Indomitable"],
     slang: ["bean-shooter","gat","heater","rod","roscoe"]
   };
@@ -225,15 +200,11 @@
   }
 
   function finalizeLoad(usedFallback){
-    // Intentionally do not print CSV counts to the UI to preserve layout.
-    // Leave the status element blank so it doesn't interrupt the visual design.
+    const counts = `First names: ${state.firstNames.length} • Last names: ${state.lastNames.length} • Archetypes: ${state.archetypes.length} • Adjectives: ${state.descriptors.length} • Slang: ${state.slang.length}`;
     const statusEl = document.getElementById('status');
-    statusEl.innerHTML = ''; // blank intentionally
-
+    statusEl.innerHTML = usedFallback ? `<span style="color:#f88">Could not load CSV — using fallback data.</span> (${counts})` : `Data loaded from CSV. ${counts}`;
     document.getElementById('generateBtn').disabled = false;
-
-    // For debugging, keep a console message
-    console.info(usedFallback ? 'Using fallback data (CSV failed to load).' : 'CSV loaded successfully.');
+    
   }
 
   // Basic CSV row splitter that handles quoted fields
@@ -257,6 +228,7 @@
   }
 
   function parseCsv(text){
+    // Split on CRLF or LF — the previous malformed regex caused a SyntaxError.
     const lines = text.split(/\r?\n/).filter(l=>l.trim().length>0);
     if(lines.length === 0) return useFallbackData();
 
@@ -301,22 +273,9 @@
   function generateCharacter(){
     const first = randomFrom(state.firstNames) || 'Unknown';
     const last = randomFrom(state.lastNames) || 'Stranger';
-    const archetypeRaw = randomFrom(state.archetypes) || 'The Detective';
+    const archetype = randomFrom(state.archetypes) || 'The Detective';
 
-    // Robust archetype lookup: try exact, "The " prefix, or normalized matching
-    const findArchetypeKey = (a)=>{
-      if(archetypeInfo[a]) return a;
-      const withThe = a.startsWith('The ') ? a : `The ${a}`;
-      if(archetypeInfo[withThe]) return withThe;
-      const noThe = a.replace(/^The\s+/i,'').toLowerCase();
-      for(const k in archetypeInfo){
-        if(k.replace(/^The\s+/i,'').toLowerCase() === noThe) return k;
-      }
-      return a;
-    };
-
-    const archetypeKey = findArchetypeKey(archetypeRaw);
-    const info = archetypeInfo[archetypeKey] || { title: archetypeRaw, abilities: [] };
+    const info = archetypeInfo[archetype] || { title: archetype, abilities: [] };
 
     const stats = generateStats();
     const nerve = calculateNerve(stats.brawn, stats.gravitas);
@@ -337,8 +296,10 @@
     `;
   }
 
+  // Allow regenerating without reloading CSV
   // ---------- Wire up UI ----------
   document.getElementById('generateBtn').addEventListener('click', generateCharacter);
+  
 
   // Load CSV on start
   loadCsvData();
