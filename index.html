@@ -2,514 +2,161 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Midnight Press – Character Generator</title>
+  <title>Midnight Press – Character Generator (Enhanced)</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap');
-
-    * {
-      box-sizing: border-box;
-    }
+    @import url('https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&display=swap');
 
     body {
-      font-family: 'Crimson Text', Georgia, serif;
+      font-family: 'Courier Prime', monospace;
       margin: 0;
       padding: 2rem;
-      min-height: 100vh;
-      background:
-              linear-gradient(45deg, #f5f2e8 0%, #f8f5ea 25%, #f2efe5 50%, #f0ede3 75%, #ede9df 100%),
-              repeating-linear-gradient(
-                      90deg,
-                      transparent,
-                      transparent 1px,
-                      rgba(0,0,0,0.02) 2px,
-                      rgba(0,0,0,0.02) 3px
-              );
-      color: #2c2c2c;
-      display: flex;
-      align-items: flex-start;
-      justify-content: center;
-      animation: pageLoad 0.8s ease-out;
+      background: #fff;
+      color: #000;
+      background-image: none;
     }
 
-    @keyframes pageLoad {
-      from {
-        opacity: 0;
-        transform: translateY(20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    .masthead {
+    h1 {
+      font-size: 2rem;
       text-align: center;
-      border-bottom: 4px double #8b4513;
-      margin-bottom: 1.5rem;
-      padding-bottom: 1rem;
-      background: linear-gradient(to right, transparent, rgba(139, 69, 19, 0.05), transparent);
-    }
-
-    .newspaper-title {
-      font-family: 'Playfair Display', serif;
-      font-size: 3.2rem;
-      font-weight: 900;
-      margin: 0;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      color: #1a1a1a;
-      text-shadow: 2px 2px 0px rgba(139, 69, 19, 0.2);
-      animation: titleFade 1.2s ease-out 0.3s both;
-    }
-
-    @keyframes titleFade {
-      from {
-        opacity: 0;
-        transform: scale(0.9);
-      }
-      to {
-        opacity: 1;
-        transform: scale(1);
-      }
-    }
-
-    .subtitle {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.1rem;
-      font-style: italic;
-      margin: 0.5rem 0 0 0;
-      color: #8b4513;
-      letter-spacing: 0.05em;
-    }
-
-    .date-line {
-      font-size: 0.9rem;
-      margin-top: 0.5rem;
-      color: #666;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
+      letter-spacing: 0.08em;
+      margin: 0 0 1rem 0;
     }
 
     .container {
-      max-width: 850px;
-      width: 100%;
-      background:
-              linear-gradient(to bottom, #fefcf8, #faf8f4),
-              repeating-linear-gradient(
-                      0deg,
-                      transparent,
-                      transparent 24px,
-                      rgba(139, 69, 19, 0.1) 25px
-              );
-      border: 3px solid #8b4513;
-      border-radius: 0;
-      padding: 2rem 2.5rem;
-      box-shadow:
-              0 0 0 1px #d2b48c,
-              0 10px 30px rgba(0, 0, 0, 0.15),
-              inset 0 0 0 8px #fefcf8;
+      max-width: 900px;
+      margin: 0 auto;
+      background: #ffffff;
+      border: 2px solid #fff;
+      border-radius: 8px;
+      padding: 2rem;
       position: relative;
-      animation: containerSlide 0.8s ease-out 0.2s both;
+      box-shadow: none;
     }
 
-    @keyframes containerSlide {
-      from {
-        opacity: 0;
-        transform: translateX(-30px);
-      }
-      to {
-        opacity: 1;
-        transform: translateX(0);
-      }
+    /* Smoky vignette effect */
+    
+
+    .toolbar {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1rem;
     }
 
-    /* Newspaper corner folds */
-    .container::before {
-      content: "";
-      position: absolute;
-      top: -3px;
-      right: -3px;
-      width: 20px;
-      height: 20px;
-      background: linear-gradient(-45deg, #d2b48c 0%, #8b4513 100%);
-      clip-path: polygon(0 0, 100% 0, 100% 100%);
-    }
-
-    .status {
-      font-size: 0.95rem;
-      margin-bottom: 1.5rem;
-      color: #666;
-      text-align: center;
-      font-style: italic;
-      padding: 0.5rem;
-      background: rgba(139, 69, 19, 0.05);
-      border-left: 3px solid #8b4513;
-      animation: statusFade 0.6s ease-out 0.8s both;
-    }
-
-    @keyframes statusFade {
-      from {
-        opacity: 0;
-        transform: translateY(10px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
+    .left-controls { display: flex; gap: .75rem; align-items: center; }
 
     button {
-      display: block;
-      margin: 0 auto 2rem auto;
-      font-family: 'Playfair Display', serif;
-      background: linear-gradient(145deg, #8b4513, #a0522d);
-      color: #fefcf8;
-      border: 2px solid #654321;
-      padding: 0.8rem 2.5rem;
-      font-size: 1.1rem;
-      font-weight: 700;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
+      background: #000;
+      color: #fff;
+      border: 2px solid #fff;
+      padding: 0.6rem 1rem;
+      border-radius: 4px;
       cursor: pointer;
-      position: relative;
-      overflow: hidden;
-      transition: all 0.3s ease;
-      box-shadow:
-              0 4px 8px rgba(139, 69, 19, 0.3),
-              inset 0 1px 0 rgba(255, 255, 255, 0.2);
-      animation: buttonSlide 0.6s ease-out 1s both;
+      font-family: 'Courier Prime', monospace;
+      letter-spacing: 0.05em;
     }
 
-    @keyframes buttonSlide {
-      from {
-        opacity: 0;
-        transform: translateY(20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+    button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    button:hover:enabled { background: #ffffff; }
+
+    .status {
+      font-size: 0.9rem;
+      color: #000;
     }
 
-    button::before {
-      content: "";
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-      transition: left 0.5s ease;
-    }
-
-    button:hover::before {
-      left: 100%;
-    }
-
-    button:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-      background: #999;
-      border-color: #777;
-    }
-
-    button:hover:enabled {
-      background: linear-gradient(145deg, #a0522d, #8b4513);
-      transform: translateY(-2px);
-      box-shadow:
-              0 6px 15px rgba(139, 69, 19, 0.4),
-              inset 0 1px 0 rgba(255, 255, 255, 0.3);
-    }
-
-    button:active:enabled {
-      transform: translateY(0);
-      box-shadow:
-              0 2px 5px rgba(139, 69, 19, 0.3),
-              inset 0 1px 0 rgba(255, 255, 255, 0.2);
-    }
-
-    .card {
-      border-top: 3px double #8b4513;
-      padding-top: 1.5rem;
-      margin-top: 1rem;
-      background: linear-gradient(to right, transparent, rgba(139, 69, 19, 0.02), transparent);
-      animation: cardSlide 0.6s ease-out;
-    }
-
-    @keyframes cardSlide {
-      from {
-        opacity: 0;
-        transform: translateX(20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateX(0);
-      }
-    }
+    .card { margin-top: 1rem; }
 
     .field {
       margin-bottom: 1.2rem;
-      padding: 0.5rem 0;
-      border-bottom: 1px dotted #d2b48c;
-      position: relative;
-      animation: fieldFade 0.4s ease-out both;
+      padding-bottom: 0.8rem;
+      border-bottom: 1px dashed rgba(255,255,255,0.2);
     }
-
-    .field:last-child {
-      border-bottom: none;
-    }
-
-    @keyframes fieldFade {
-      from {
-        opacity: 0;
-        transform: translateY(5px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    .field:nth-child(1) { animation-delay: 0.1s; }
-    .field:nth-child(2) { animation-delay: 0.2s; }
-    .field:nth-child(3) { animation-delay: 0.3s; }
-    .field:nth-child(4) { animation-delay: 0.4s; }
-    .field:nth-child(5) { animation-delay: 0.5s; }
-    .field:nth-child(6) { animation-delay: 0.6s; }
 
     .field-label {
-      font-family: 'Playfair Display', serif;
-      font-weight: 700;
+      font-weight: 600;
       text-transform: uppercase;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       letter-spacing: 0.1em;
-      color: #8b4513;
-      margin-bottom: 0.3rem;
-      position: relative;
+      color: #000;
+      margin-bottom: 0.25rem;
     }
 
-    .field-label::after {
-      content: "";
-      position: absolute;
-      bottom: -2px;
-      left: 0;
-      width: 30px;
-      height: 2px;
-      background: #8b4513;
-      transition: width 0.3s ease;
-    }
+    .inline-list span::after { content: ", "; }
+    .inline-list span:last-child::after { content: ""; }
 
-    .field:hover .field-label::after {
-      width: 60px;
-    }
+    .abilities { white-space: pre-wrap; }
 
-    .field-value {
-      font-size: 1.1rem;
-      line-height: 1.5;
-      color: #2c2c2c;
-      position: relative;
-    }
-
-    .inline-list {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-    }
-
-    .inline-list span {
-      display: inline-block;
-      padding: 0.25rem 0.75rem;
-      background: rgba(139, 69, 19, 0.1);
-      border: 1px solid rgba(139, 69, 19, 0.3);
-      font-style: italic;
-      border-radius: 15px;
-      transition: all 0.3s ease;
-      animation: tagPop 0.4s ease-out both;
-    }
-
-    .inline-list span:nth-child(1) { animation-delay: 0.1s; }
-    .inline-list span:nth-child(2) { animation-delay: 0.2s; }
-    .inline-list span:nth-child(3) { animation-delay: 0.3s; }
-
-    @keyframes tagPop {
-      from {
-        opacity: 0;
-        transform: scale(0.8);
-      }
-      to {
-        opacity: 1;
-        transform: scale(1);
-      }
-    }
-
-    .inline-list span:hover {
-      background: rgba(139, 69, 19, 0.2);
-      transform: translateY(-2px);
-      box-shadow: 0 2px 5px rgba(139, 69, 19, 0.2);
-    }
-
-    .inline-list span::after {
-      content: "";
-    }
-
-    .slang-item {
-      display: block;
-      margin: 0.4rem 0;
-      padding-left: 1.5rem;
-      position: relative;
-      font-style: italic;
-      color: #555;
-      transition: color 0.3s ease;
-    }
-
-    .slang-item::before {
-      content: "▶";
-      position: absolute;
-      left: 0;
-      color: #8b4513;
-      font-size: 0.9rem;
-      animation: bulletPulse 2s ease-in-out infinite;
-    }
-
-    @keyframes bulletPulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.6; }
-    }
-
-    .slang-item:hover {
-      color: #2c2c2c;
-    }
-
-    .stats-container {
-      display: flex;
-      gap: 1.5rem;
-      align-items: center;
-      flex-wrap: wrap;
-    }
-
-    .stat-item {
-      font-family: 'Playfair Display', serif;
-      font-weight: 600;
-      letter-spacing: 0.05em;
-    }
-
-    .stat-value {
-      color: #8b4513;
-      font-weight: 700;
-      font-size: 1.1em;
-    }
-
-    code {
-      background: rgba(139, 69, 19, 0.1);
-      padding: 0.2rem 0.5rem;
-      border-radius: 3px;
-      font-size: 0.9rem;
-      border: 1px solid rgba(139, 69, 19, 0.2);
-      color: #8b4513;
-      font-family: 'Courier New', monospace;
-    }
-
-    .error {
-      color: #d2691e;
-      font-weight: 600;
-    }
-
-    .small {
-      font-size: 0.9rem;
-      color: #888;
-      text-align: center;
-      margin-top: 2rem;
-      font-style: italic;
-      padding-top: 1rem;
-      border-top: 1px dotted #d2b48c;
-    }
-
-    /* Typewriter effect for character names */
-    .typewriter {
-      overflow: hidden;
-      border-right: 2px solid #8b4513;
-      white-space: nowrap;
-      animation:
-              typing 1.5s steps(40, end),
-              blink-caret 0.75s step-end infinite;
-    }
-
-    @keyframes typing {
-      from { width: 0 }
-      to { width: 100% }
-    }
-
-    @keyframes blink-caret {
-      from, to { border-color: transparent }
-      50% { border-color: #8b4513; }
-    }
-
-    /* Ink spreading effect */
-    .ink-spread {
-      position: relative;
-      overflow: hidden;
-    }
-
-    .ink-spread::after {
-      content: "";
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(139, 69, 19, 0.1), transparent);
-      animation: inkSpread 0.8s ease-out;
-    }
-
-    @keyframes inkSpread {
-      to {
-        left: 100%;
-      }
+    @media (max-width:600px){
+      .toolbar { flex-direction: column; align-items: stretch; gap: .5rem; }
     }
   </style>
 </head>
 <body>
 <div class="container">
-  <div class="masthead">
-    <h1 class="newspaper-title">Midnight Press</h1>
-    <div class="subtitle">Character Generator & Registry</div>
-    <div class="date-line">Special Edition • Today's Date</div>
-  </div>
+  <h1>Midnight Press – Character Generator</h1>
 
-  <div class="status" id="status">
-    Loading character archives from local records...
+  <div class="toolbar">
+    <div class="left-controls">
+      <button id="generateBtn" disabled>Generate Character</button>
+      
+    </div>
+    <div class="status" id="status">Loading data from <code>CharGeneratorData.csv</code>…</div>
   </div>
-
-  <button id="generateBtn" disabled>Print New Character Profile</button>
 
   <div class="card" id="output" aria-live="polite">
-    <div class="field">
-      <div class="field-label">Editorial Note</div>
-      <div class="field-value">
-        Press the button above to generate a fresh character profile from our extensive archives.
-      </div>
+    <div class="field"><div class="field-label">Waiting in the wings</div>
+      <div>Click <strong>Generate Character</strong> once data has loaded.</div>
     </div>
   </div>
-
-  <p class="small">
-    Source: <code>CharGeneratorData.csv</code> archive file required in same directory.
-  </p>
 </div>
 
 <script>
-  // ==============================
-  // CONFIG – LOCAL CSV FILE NAME
-  // ==============================
+  // ---------- Configuration ----------
   const CSV_FILE_PATH = "CharGeneratorData.csv";
 
-  const fallbackData = {
-    firstNames: ["Anthony", "Ada", "Albert", "Alma"],
-    lastNames: ["Abrams", "Aguilar", "Akiyama", "Alvarez"],
-    archetypes: ["The Detective", "The Femme Fatale", "The Hooligan", "The Socialite", "The Professor"],
-    descriptors: ["Good with hands", "Knowledgeable", "Short-fused", "Brown-noser", "Indomitable"],
-    slang: ["Gun: Bean-shooter", "Gun: Gat", "Gun: Heater", "Gun: Rod", "Gun: Roscoe"]
+  // ---------- Archetype definitions (display & abilities) ----------
+  const archetypeInfo = {
+    "The Detective": {
+      title: "Detective",
+      abilities: [
+        "Known About Town: Gain +1 Social Tie every adventure.",
+        "Hunch: Once per arc, receive a warning or insight that guides you toward or away from danger."
+      ]
+    },
+    "The Themme Fatale": {
+      title: "Themme Fatale",
+      abilities: [
+        "Play or Be Played: On your first Social Tie roll, 3 = they have power over you, 4 = you have power over them.",
+        "My Real Name Is…: Once per game, permanently change your three descriptors."
+      ]
+    },
+    "The Hooligan": {
+      title: "Hooligan",
+      abilities: [
+        "Average Joe: Roll twice and take the better result with working-class folks.",
+        "Know a Guy: Once per arc, you know someone who provides a needed good or service."
+      ]
+    },
+    "The Socialite": {
+      title: "Socialite",
+      abilities: [
+        "High Company: Roll twice and take the better result with high-class individuals.",
+        "Investor: Once per arc, you can front money for a major purchase the group couldn’t normally afford."
+      ]
+    },
+    "The Professor": {
+      title: "Professor",
+      abilities: [
+        "Respectable Company: On your first Social Tie roll, 2 and 5 = Mutual Connection.",
+        "Know It All: Once per arc, you know a random fact that's helpful in the moment."
+      ]
+    }
   };
 
+  // ---------- State ----------
   const state = {
     firstNames: [],
     lastNames: [],
@@ -519,277 +166,142 @@
     usingFallback: false
   };
 
-  const statusEl = document.getElementById("status");
-  const outputEl = document.getElementById("output");
-  const generateBtn = document.getElementById("generateBtn");
+  // ---------- Fallback data (used if CSV fails) ----------
+  const fallbackData = {
+    firstNames: ["Anthony","Ada","Albert","Alma"],
+    lastNames: ["Abrams","Aguilar","Akiyama","Alvarez"],
+    archetypes: ["The Detective","The Themme Fatale","The Hooligan","The Socialite","The Professor"],
+    descriptors: ["Good with hands","Knowledgeable","Short-fused","Brown-noser","Indomitable"],
+    slang: ["bean-shooter","gat","heater","rod","roscoe"]
+  };
 
-  // Set today's date
-  document.querySelector('.date-line').textContent =
-          `Special Edition • ${new Date().toLocaleDateString('en-US', {
-            weekday: 'long',
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
-          })}`;
-
-  // ==============================
-  // CSV LOADING & PARSING
-  // ==============================
-
-  async function loadCsvData() {
-    try {
+  // ---------- CSV Loading & Parsing ----------
+  async function loadCsvData(){
+    try{
       const res = await fetch(CSV_FILE_PATH);
-      if (!res.ok) {
-        throw new Error("Network response was not ok");
-      }
-      const csvText = await res.text();
-      parseCsvIntoState(csvText);
-      finalizeDataLoad(false);
-    } catch (err) {
-      console.error("Error loading CSV, using fallback data:", err);
+      if(!res.ok) throw new Error('Network response not ok');
+      const text = await res.text();
+      parseCsv(text);
+      finalizeLoad(false);
+    }catch(err){
+      console.warn('Failed to load CSV, using fallback data:', err);
       useFallbackData();
-      finalizeDataLoad(true);
+      finalizeLoad(true);
     }
   }
 
-  function parseCsvIntoState(csvText) {
-    const lines = csvText.split(/\r?\n/).filter(line => line.trim().length > 0);
-    if (lines.length === 0) return;
-
-    const headers = splitCsvRow(lines[0]).map(h => h.trim());
-    const headerMap = {};
-
-    headers.forEach((h, idx) => {
-      const key = h.toLowerCase();
-      if (key.includes("first name")) headerMap.firstNames = idx;
-      else if (key.includes("last name")) headerMap.lastNames = idx;
-      else if (key.includes("archetype")) headerMap.archetypes = idx;
-      else if (key.includes("adjective")) headerMap.descriptors = idx;
-      else if (key.includes("slang")) headerMap.slang = idx;
-    });
-
-    const firstNames = [];
-    const lastNames = [];
-    const archetypes = [];
-    const descriptors = [];
-    const slang = [];
-
-    for (let i = 1; i < lines.length; i++) {
-      const row = splitCsvRow(lines[i]);
-      if (headerMap.firstNames !== undefined) {
-        const val = (row[headerMap.firstNames] || "").trim();
-        if (val) firstNames.push(val);
-      }
-      if (headerMap.lastNames !== undefined) {
-        const val = (row[headerMap.lastNames] || "").trim();
-        if (val) lastNames.push(val);
-      }
-      if (headerMap.archetypes !== undefined) {
-        const val = (row[headerMap.archetypes] || "").trim();
-        if (val) archetypes.push(val);
-      }
-      if (headerMap.descriptors !== undefined) {
-        const val = (row[headerMap.descriptors] || "").trim();
-        if (val) descriptors.push(val);
-      }
-      if (headerMap.slang !== undefined) {
-        const val = (row[headerMap.slang] || "").trim();
-        if (val) slang.push(val);
-      }
-    }
-
-    state.firstNames = unique(firstNames);
-    state.lastNames = unique(lastNames);
-    state.archetypes = unique(archetypes);
-    state.descriptors = unique(descriptors);
-    state.slang = unique(slang);
-  }
-
-  function splitCsvRow(row) {
-    const result = [];
-    let current = "";
-    let inQuotes = false;
-
-    for (let i = 0; i < row.length; i++) {
-      const char = row[i];
-      if (char === '"' && (i === 0 || row[i - 1] !== "\\")) {
-        inQuotes = !inQuotes;
-      } else if (char === "," && !inQuotes) {
-        result.push(current);
-        current = "";
-      } else {
-        current += char;
-      }
-    }
-    result.push(current);
-    return result;
-  }
-
-  function unique(arr) {
-    return [...new Set(arr)];
-  }
-
-  function useFallbackData() {
-    state.firstNames = fallbackData.firstNames;
-    state.lastNames = fallbackData.lastNames;
-    state.archetypes = fallbackData.archetypes;
-    state.descriptors = fallbackData.descriptors;
-    state.slang = fallbackData.slang;
+  function useFallbackData(){
+    state.firstNames = [...fallbackData.firstNames];
+    state.lastNames = [...fallbackData.lastNames];
+    state.archetypes = [...fallbackData.archetypes];
+    state.descriptors = [...fallbackData.descriptors];
+    state.slang = [...fallbackData.slang];
     state.usingFallback = true;
   }
 
-  function finalizeDataLoad(usedFallback) {
-    const counts = [
-      `Names: ${state.firstNames.length + state.lastNames.length}`,
-      `Archetypes: ${state.archetypes.length}`,
-      `Traits: ${state.descriptors.length}`,
-      `Slang: ${state.slang.length}`
-    ].join(" • ");
-
-    if (usedFallback) {
-      statusEl.innerHTML = `<span class="error">Archive file unavailable. Using emergency backup records.</span> (${counts})`;
-    } else {
-      statusEl.textContent = `Character archives loaded successfully. ${counts} entries available.`;
-    }
-    generateBtn.disabled = false;
+  function finalizeLoad(usedFallback){
+    const counts = `First names: ${state.firstNames.length} • Last names: ${state.lastNames.length} • Archetypes: ${state.archetypes.length} • Adjectives: ${state.descriptors.length} • Slang: ${state.slang.length}`;
+    const statusEl = document.getElementById('status');
+    statusEl.innerHTML = usedFallback ? `<span style="color:#f88">Could not load CSV — using fallback data.</span> (${counts})` : `Data loaded from CSV. ${counts}`;
+    document.getElementById('generateBtn').disabled = false;
+    
   }
 
-  // ==============================
-  // RANDOM HELPERS
-  // ==============================
-
-  function randomFrom(array) {
-    if (!array || array.length === 0) return null;
-    const idx = Math.floor(Math.random() * array.length);
-    return array[idx];
-  }
-
-  function randomSample(array, count) {
-    const copy = [...array];
-    const result = [];
-    count = Math.min(count, copy.length);
-    for (let i = 0; i < count; i++) {
-      const idx = Math.floor(Math.random() * copy.length);
-      result.push(copy[idx]);
-      copy.splice(idx, 1);
-    }
-    return result;
-  }
-
-  function generateStats() {
-    const stats = [1, 1, 1];
-    let remaining = 6;
-
-    while (remaining > 0) {
-      const idx = Math.floor(Math.random() * 3);
-      if (stats[idx] < 5) {
-        stats[idx]++;
-        remaining--;
+  // Basic CSV row splitter that handles quoted fields
+  function splitRow(row){
+    const out = [];
+    let cur = '';
+    let inQuotes = false;
+    for(let i=0;i<row.length;i++){
+      const ch = row[i];
+      if(ch === '"'){
+        inQuotes = !inQuotes;
+      }else if(ch === ',' && !inQuotes){
+        out.push(cur);
+        cur = '';
+      }else{
+        cur += ch;
       }
     }
-
-    return {
-      brawn: stats[0],
-      skill: stats[1],
-      gravitas: stats[2]
-    };
+    out.push(cur);
+    return out.map(s=>s.trim());
   }
 
-  function calculateNerve(brawn, gravitas) {
-    const base = Math.max(brawn, gravitas);
-    return 6 + base;
+  function parseCsv(text){
+    // Split on CRLF or LF — the previous malformed regex caused a SyntaxError.
+    const lines = text.split(/\r?\n/).filter(l=>l.trim().length>0);
+    if(lines.length === 0) return useFallbackData();
+
+    const headers = splitRow(lines[0]).map(h=>h.toLowerCase());
+    const headerMap = {};
+    headers.forEach((h,idx)=>{
+      if(h.includes('first')) headerMap.first = idx;
+      else if(h.includes('last')) headerMap.last = idx;
+      else if(h.includes('archetype')) headerMap.arch = idx;
+      else if(h.includes('adjective') || h.includes('descriptor')) headerMap.desc = idx;
+      else if(h.includes('slang')) headerMap.slang = idx;
+    });
+
+    for(let i=1;i<lines.length;i++){
+      const row = splitRow(lines[i]);
+      if(headerMap.first !== undefined && row[headerMap.first]) state.firstNames.push(row[headerMap.first]);
+      if(headerMap.last !== undefined && row[headerMap.last]) state.lastNames.push(row[headerMap.last]);
+      if(headerMap.arch !== undefined && row[headerMap.arch]) state.archetypes.push(row[headerMap.arch]);
+      if(headerMap.desc !== undefined && row[headerMap.desc]) state.descriptors.push(row[headerMap.desc]);
+      if(headerMap.slang !== undefined && row[headerMap.slang]) state.slang.push(row[headerMap.slang]);
+    }
+
+    // De-duplicate lists
+    state.firstNames = Array.from(new Set(state.firstNames));
+    state.lastNames = Array.from(new Set(state.lastNames));
+    state.archetypes = Array.from(new Set(state.archetypes));
+    state.descriptors = Array.from(new Set(state.descriptors));
+    state.slang = Array.from(new Set(state.slang));
   }
 
-  // ==============================
-  // CHARACTER GENERATION
-  // ==============================
+  // ---------- Helpers ----------
+  function randomFrom(arr){ if(!arr || arr.length===0) return null; return arr[Math.floor(Math.random()*arr.length)]; }
+  function randomSample(arr, n){ if(!arr) return []; const copy = [...arr]; const out = []; n = Math.min(n, copy.length); for(let i=0;i<n;i++){ const idx = Math.floor(Math.random()*copy.length); out.push(copy[idx]); copy.splice(idx,1); } return out; }
 
-  function generateCharacter() {
-    // Add loading animation
-    generateBtn.textContent = "Printing Profile...";
-    generateBtn.disabled = true;
-
-    setTimeout(() => {
-      const first = randomFrom(state.firstNames) || "Unknown";
-      const last = randomFrom(state.lastNames) || "Stranger";
-      const archetype = randomFrom(state.archetypes) || "Drifter";
-
-      const stats = generateStats();
-      const nerve = calculateNerve(stats.brawn, stats.gravitas);
-
-      const descriptors = state.descriptors.length > 0
-              ? randomSample(state.descriptors, 3)
-              : ["Mysterious", "Tired", "Sharp"];
-
-      const slang = state.slang.length > 0
-              ? randomSample(state.slang, 3)
-              : ["Gun: Bean-shooter", "Gun: Gat", "Gun: Heater"];
-
-      renderCharacter({
-        name: `${first} ${last}`,
-        archetype,
-        stats,
-        nerve,
-        descriptors,
-        slang
-      });
-
-      generateBtn.textContent = "Print New Character Profile";
-      generateBtn.disabled = false;
-    }, 800);
+  function generateStats(){ const stats = [1,1,1]; let remaining = 6; while(remaining>0){ const i = Math.floor(Math.random()*3); if(stats[i] < 5){ stats[i]++; remaining--; } }
+    return { brawn: stats[0], skill: stats[1], gravitas: stats[2] };
   }
 
-  function renderCharacter(char) {
-    const slangHtml = char.slang
-            .map(s => `<span class="slang-item">${s}</span>`)
-            .join("");
+  function calculateNerve(brawn, gravitas){ return 6 + Math.max(brawn, gravitas); }
 
-    outputEl.innerHTML = `
-        <div class="field">
-          <div class="field-label">Name</div>
-          <div class="field-value typewriter ink-spread">${char.name}</div>
-        </div>
+  // ---------- Character Generation & Rendering ----------
+  function generateCharacter(){
+    const first = randomFrom(state.firstNames) || 'Unknown';
+    const last = randomFrom(state.lastNames) || 'Stranger';
+    const archetype = randomFrom(state.archetypes) || 'The Detective';
 
-        <div class="field">
-          <div class="field-label">Archetype</div>
-          <div class="field-value">${char.archetype}</div>
-        </div>
+    const info = archetypeInfo[archetype] || { title: archetype, abilities: [] };
 
-        <div class="field">
-          <div class="field-label">Core Stats</div>
-          <div class="field-value stats-container">
-            <span class="stat-item">Brawn: <span class="stat-value">${char.stats.brawn}</span></span>
-            <span class="stat-item">Skill: <span class="stat-value">${char.stats.skill}</span></span>
-            <span class="stat-item">Gravitas: <span class="stat-value">${char.stats.gravitas}</span></span>
-          </div>
-        </div>
+    const stats = generateStats();
+    const nerve = calculateNerve(stats.brawn, stats.gravitas);
 
-        <div class="field">
-          <div class="field-label">Nerve</div>
-          <div class="field-value"><span class="stat-value">${char.nerve}</span></div>
-        </div>
+    const descriptors = randomSample(state.descriptors, 3);
+    const slang = randomSample(state.slang, 3);
 
-        <div class="field">
-          <div class="field-label">Described As:</div>
-          <div class="field-value inline-list">
-            ${char.descriptors.map(d => `<span>${d}</span>`).join("")}
-          </div>
-        </div>
+    const abilitiesHtml = info.abilities.length ? `<div class="abilities">${info.abilities.map(a=>`• ${a}`).join('\n')}</div>` : `<div class="abilities">(no archetype abilities defined)</div>`;
 
-        <div class="field">
-          <div class="field-label">Likes to Say:</div>
-          <div class="field-value">
-            ${slangHtml}
-          </div>
-        </div>
-      `;
+    document.getElementById('output').innerHTML = `
+      <div class='field'><div class='field-label'>Name</div>${first} ${last}</div>
+      <div class='field'><div class='field-label'>Archetype</div>${info.title}</div>
+      <div class='field'><div class='field-label'>Abilities</div>${abilitiesHtml}</div>
+      <div class='field'><div class='field-label'>Stats</div>Brawn: ${stats.brawn} | Skill: ${stats.skill} | Gravitas: ${stats.gravitas}</div>
+      <div class='field'><div class='field-label'>Nerve</div>${nerve}</div>
+      <div class='field'><div class='field-label'>Descriptors</div><div class='inline-list'>${descriptors.map(d=>`<span>${d}</span>`).join('')}</div></div>
+      <div class='field'><div class='field-label'>Favorite Slang</div>${slang.join('<br>')}</div>
+    `;
   }
 
-  // ==============================
-  // INITIALIZE
-  // ==============================
+  // Allow regenerating without reloading CSV
+  // ---------- Wire up UI ----------
+  document.getElementById('generateBtn').addEventListener('click', generateCharacter);
+  
 
-  generateBtn.addEventListener("click", generateCharacter);
+  // Load CSV on start
   loadCsvData();
 </script>
 </body>
