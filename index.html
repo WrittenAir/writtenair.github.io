@@ -9,6 +9,8 @@
        We ask for Old English Text MT first (system), then fallback
        to UnifrakturCook from Google Fonts (loaded below). */
     @import url('https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&family=UnifrakturCook:wght@700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Old+Standard+TT:wght@700&display=swap');
+
 
     body {
       font-family: 'Courier Prime', monospace;
@@ -20,13 +22,12 @@
     }
 
     h1 {
-      font-size: 2.2rem;
-      text-align: center;
-      letter-spacing: 0.08em;
-      margin: 0 0 1rem 0;
-      /* prefer system Old English, then UnifrakturCook (Google), then generic serif */
-      font-family: "Old English Text MT", "UnifrakturCook", "Blackletter", serif;
-    }
+  font-size: 2.6rem;
+  text-align: center;
+  letter-spacing: 0.04em;
+  margin: 0 0 1rem 0;
+  font-family: "Old English Text MT", "Old Standard TT", serif;
+}
 
     .container {
       max-width: 900px;
